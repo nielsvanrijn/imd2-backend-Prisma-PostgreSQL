@@ -1,0 +1,147 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enums
+enum Role {
+  USER
+  ADMIN
+}
+
+// Tables
+model User {
+  id			Int			@id @default(autoincrement())
+  email			String		@unique
+  password		String
+  role			Role		@default(USER)
+  profile		Profile?
+  tokenVersion	Int			@default(0)
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+}
+model Profile {
+  id			Int			@id @default(autoincrement())
+  name			String
+  bio			String?
+  avatarUrl		String?
+  user			User		@relation(fields: [userId], references: [id])
+  userId		Int
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+}
+model Genre {
+  id			Int			@id @default(autoincrement())
+  name			String
+  movies		GenresOnMovies[]
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+}
+model Movie {
+  id			Int			@id @default(autoincrement())
+  name			String
+  year			Int?
+  length		Int?
+  description	String?
+  posterUrls	String[]
+  posterUrlsIndex		Int	@default(0)
+  trailerUrls	String[]
+  directors		DirectorsOnMovies[]
+  writers		WritersOnMovies[]
+  cast			CastOnMovies[]
+  genres		GenresOnMovies[]
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+}
+model Person {
+  id			Int			@id @default(autoincrement())
+  firstName		String
+  lastName		String
+  birthday		DateTime
+  country		Country		@relation(fields: [countryId], references: [id])
+  countryId		Int
+  bio			String
+  avatarUrl		String
+  director		DirectorsOnMovies[]
+  writer		WritersOnMovies[]
+//   character		CharactersOnPersons[]
+  cast			CastOnMovies[]
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+}
+model Character {
+  id			Int			@id @default(autoincrement())
+  firstName		String
+  lastName		String
+  birthday		DateTime
+  bio			String
+  cast			CastOnMovies[]
+//   persons		CharactersOnPersons[]
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+}
+model Country {
+  id			Int			@id @default(autoincrement())
+  name			String
+  persons		Person[]
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+}
+
+// Relations
+model GenresOnMovies {
+  movie			Movie		@relation(fields: [movieId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  movieId		Int
+  genre			Genre		@relation(fields: [genreId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  genreId		Int
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+
+  @@id([movieId, genreId])
+}
+// model CharactersOnPersons {
+//   person		Person	@relation(fields: [personId], references: [id])
+//   personId		Int
+//   character		Character	@relation(fields: [characterId], references: [id])
+//   characterId	Int
+//   createdAt		DateTime	@default(now())
+//   updatedAt		DateTime	@updatedAt
+
+//   @@id([personId, characterId])
+// }
+model DirectorsOnMovies {
+  movie			Movie		@relation(fields: [movieId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  movieId		Int
+  person		Person		@relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  personId		Int
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+
+  @@id([movieId, personId])
+}
+model WritersOnMovies {
+  movie			Movie		@relation(fields: [movieId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  movieId		Int
+  person		Person		@relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  personId		Int
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+
+  @@id([movieId, personId])
+}
+model CastOnMovies {
+  movie			Movie		@relation(fields: [movieId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  movieId		Int
+  person		Person		@relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  personId		Int
+  character		Character?	@relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  characterId	Int?
+  createdAt		DateTime	@default(now())
+  updatedAt		DateTime	@updatedAt
+
+  @@id([movieId, personId])
+}
