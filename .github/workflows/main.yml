@@ -18,6 +18,7 @@ jobs:
       - name: Push to dokku
         uses: dokku/github-action@v1.0.1
         with:
+          branch: 'mian'
           git_remote_url: '${{ secrets.SSH_URL }}/imd2-prisma-backend'
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           
