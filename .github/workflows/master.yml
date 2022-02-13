@@ -4,7 +4,7 @@ name: Dokku
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
@@ -18,13 +18,12 @@ jobs:
       - name: Push to dokku
         uses: dokku/github-action@v1.0.1
         with:
-          branch: 'main'
           git_remote_url: '${{ secrets.SSH_URL }}/imd2-prisma-backend'
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           
       - name: Notify
         uses: fjogeleit/http-request-action@master
         with:
-          url: 'https://api.pushcut.io/v1/notifications/github_deploy_done?title=Deploy successfull&text=Main branch of imd2-prisma-backend applicaton was successfully deployed to dokku!'
+          url: 'https://api.pushcut.io/v1/notifications/github_deploy_done?title=Deploy successfull&text=Master branch of imd2-prisma-backend applicaton was successfully deployed to dokku!'
           method: 'POST'
           customHeaders: "{\"API-key\": \"${{ secrets.PUSHCUT_API_KEY }}\"}"
