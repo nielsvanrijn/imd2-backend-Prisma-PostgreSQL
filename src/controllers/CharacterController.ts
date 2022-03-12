@@ -44,6 +44,7 @@ export const getCharacters = async (req: Request, res: Response) => {
         const characters = await prisma.character.findMany({
             include: {
                 cast: true,
+                _count: true,
                 // persons: true,
             }
         });
