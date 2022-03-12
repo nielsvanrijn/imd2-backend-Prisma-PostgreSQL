@@ -20,6 +20,7 @@ jobs:
         with:
           git_remote_url: '${{ secrets.SSH_URL }}/imd2-prisma-backend'
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          git_push_flags: '--force'
           
       - name: Notify
         uses: fjogeleit/http-request-action@master
