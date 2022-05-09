@@ -81,30 +81,30 @@ export const getMoviesWithSortAndFilter = async (req: Request, res: Response) =>
 	
     // remove empty arrays from filter
     Object.keys(filter).forEach((k) => filter[k].length === 0 && delete filter[k]);
-    
+
     try {
         const movies = await prisma.movie.findMany({
             where: {
-                genres: {
+                genres: filter.genres ? {
                     some: {
-                        genreId: { in: filter.genreIds ? filter.genreIds : undefined },
+                        genreId: { in: filter.genres.map((f: any) => f.id) },
                     }
-                },
-                cast: {
+                } : {},
+                cast: filter.castPersons ? {
                     some: {
-                        personId: { in: filter.castPersonIds ? filter.castPersonIds : undefined },
+                        personId: { in: filter.castPersons.map((f: any) => f.id) },
                     }
-                },
-                directors: {
+                } : {},
+                directors: filter.directorPersons ? {
                     some: {
-                        personId: { in: filter.directorPersonIds ? filter.directorPersonIds : undefined },
+                        personId: { in: filter.directorPersons.map((f: any) => f.id) },
                     }
-                },
-                writers: {
+                } : {},
+                writers: filter.writerPersons ? {
                     some: {
-                        personId: { in: filter.writerPersonIds ? filter.writerPersonIds : undefined },
+                        personId: { in: filter.writerPersons.map((f: any) => f.id) },
                     }
-                },
+                } : {},
             },
             include: {
                 directors: true,
@@ -383,44 +383,93 @@ export const deleteMovie = async (req: Request, res: Response) => {
 
 
 // Test
+// export const test = async (req: Request, res: Response) => {
+//     try {
+//         const movie = await prisma.movie.findUnique<Prisma.MovieFindUniqueArgs>({
+//             where: {
+//                 id: 1
+//             },
+//             include: {
+//                 directors: true,
+//                 writers: true,
+//                 cast: {
+//                     select: {
+//                         person: {
+//                             select: {
+//                                 firstName: true,
+//                                 lastName: true,
+//                             }
+//                         },
+//                         character: {
+//                             select: {
+//                                 firstName: true,
+//                                 lastName: true,
+//                             }
+//                         }
+//                     }
+//                 },
+//                 genres: {
+//                     select: {
+//                         genre: {
+//                             select: {
+//                                 name: true
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         });
+    
+//         return res.json(movie);
+//     } catch(e) {
+//         console.log(e);
+//         return res.status(500).send({ ok: false});
+//     }
+// };
+
 export const test = async (req: Request, res: Response) => {
+
+    console.log('Test');
+
+    const bool = false;
+    
     try {
-        const movie = await prisma.movie.findUnique<Prisma.MovieFindUniqueArgs>({
+        const movies = await prisma.movie.findMany({
             where: {
-                id: 1
+                genres: {
+                    some: {
+                        genreId: { in: [9] },
+                    }
+                },
+                cast: bool ? {
+                    some: {
+                        personId: { in: undefined },
+                    }
+                } : {},
+                // cast: {
+                //     some: {
+                //         personId: { in: undefined },
+                //     }
+                // },
+                directors: {
+                    some: {
+                        personId: { in: undefined },
+                    }
+                },
+                writers: {
+                    some: {
+                        personId: { in: undefined },
+                    }
+                },
             },
             include: {
                 directors: true,
                 writers: true,
-                cast: {
-                    select: {
-                        person: {
-                            select: {
-                                firstName: true,
-                                lastName: true,
-                            }
-                        },
-                        character: {
-                            select: {
-                                firstName: true,
-                                lastName: true,
-                            }
-                        }
-                    }
-                },
-                genres: {
-                    select: {
-                        genre: {
-                            select: {
-                                name: true
-                            }
-                        }
-                    }
-                }
-            }
+                cast: true,
+                genres: true,
+            },
         });
-    
-        return res.json(movie);
+        return res.json(movies);
     } catch(e) {
         console.log(e);
         return res.status(500).send({ ok: false});
