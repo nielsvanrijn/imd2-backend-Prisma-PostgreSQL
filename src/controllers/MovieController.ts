@@ -85,24 +85,44 @@ export const getMoviesWithSortAndFilter = async (req: Request, res: Response) =>
     try {
         const movies = await prisma.movie.findMany({
             where: {
+                // genres: filter.genres ? {
+                //     some: {
+                //         genreId: { in: filter.genres.map((f: any) => f.id) },
+                //     }
+                // } : {},
+                // cast: filter.castPersons ? {
+                //     some: {
+                //         personId: { in: filter.castPersons.map((f: any) => f.id) },
+                //     }
+                // } : {},
+                // directors: filter.directorPersons ? {
+                //     some: {
+                //         personId: { in: filter.directorPersons.map((f: any) => f.id) },
+                //     }
+                // } : {},
+                // writers: filter.writerPersons ? {
+                //     some: {
+                //         personId: { in: filter.writerPersons.map((f: any) => f.id) },
+                //     }
+                // } : {},
                 genres: filter.genres ? {
                     some: {
-                        genreId: { in: filter.genres.map((f: any) => f.id) },
+                        genreId: { in: filter.genres },
                     }
                 } : {},
                 cast: filter.castPersons ? {
                     some: {
-                        personId: { in: filter.castPersons.map((f: any) => f.id) },
+                        personId: { in: filter.castPersons },
                     }
                 } : {},
                 directors: filter.directorPersons ? {
                     some: {
-                        personId: { in: filter.directorPersons.map((f: any) => f.id) },
+                        personId: { in: filter.directorPersons },
                     }
                 } : {},
                 writers: filter.writerPersons ? {
                     some: {
-                        personId: { in: filter.writerPersons.map((f: any) => f.id) },
+                        personId: { in: filter.writerPersons },
                     }
                 } : {},
             },

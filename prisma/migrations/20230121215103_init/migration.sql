@@ -5,7 +5,7 @@ CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "password" TEXT,
     "role" "Role" NOT NULL DEFAULT E'USER',
     "tokenVersion" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -45,6 +45,7 @@ CREATE TABLE "Movie" (
     "length" INTEGER,
     "description" TEXT,
     "posterUrls" TEXT[],
+    "posterUrlsIndex" INTEGER NOT NULL DEFAULT 0,
     "trailerUrls" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -131,11 +132,44 @@ CREATE TABLE "CastOnMovies" (
     CONSTRAINT "CastOnMovies_pkey" PRIMARY KEY ("movieId","personId")
 );
 
+-- CreateTable
+CREATE TABLE "Authenticator" (
+    "credentialID" TEXT NOT NULL,
+    "credentialPublicKey" BYTEA NOT NULL,
+    "counter" BIGINT NOT NULL,
+    "credentialDeviceType" TEXT NOT NULL,
+    "credentialBackedUp" BOOLEAN NOT NULL,
+    "transports" TEXT[],
+    "userId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Authenticator_pkey" PRIMARY KEY ("credentialID")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Profile_userId_key" ON "Profile"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Genre_name_key" ON "Genre"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Movie_name_year_length_key" ON "Movie"("name", "year", "length");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Person_firstName_lastName_birthday_key" ON "Person"("firstName", "lastName", "birthday");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Character_firstName_lastName_birthday_bio_key" ON "Character"("firstName", "lastName", "birthday", "bio");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Country_name_key" ON "Country"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Authenticator_credentialID_key" ON "Authenticator"("credentialID");
 
 -- AddForeignKey
 ALTER TABLE "Profile" ADD CONSTRAINT "Profile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -144,10 +178,10 @@ ALTER TABLE "Profile" ADD CONSTRAINT "Profile_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Person" ADD CONSTRAINT "Person_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "GenresOnMovies" ADD CONSTRAINT "GenresOnMovies_movieId_fkey" FOREIGN KEY ("movieId") REFERENCES "Movie"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "GenresOnMovies" ADD CONSTRAINT "GenresOnMovies_genreId_fkey" FOREIGN KEY ("genreId") REFERENCES "Genre"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "GenresOnMovies" ADD CONSTRAINT "GenresOnMovies_genreId_fkey" FOREIGN KEY ("genreId") REFERENCES "Genre"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "GenresOnMovies" ADD CONSTRAINT "GenresOnMovies_movieId_fkey" FOREIGN KEY ("movieId") REFERENCES "Movie"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DirectorsOnMovies" ADD CONSTRAINT "DirectorsOnMovies_movieId_fkey" FOREIGN KEY ("movieId") REFERENCES "Movie"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -169,3 +203,6 @@ ALTER TABLE "CastOnMovies" ADD CONSTRAINT "CastOnMovies_personId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "CastOnMovies" ADD CONSTRAINT "CastOnMovies_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Authenticator" ADD CONSTRAINT "Authenticator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -130,6 +130,8 @@ export const loginUserSchema = [
                 });
             if (!user) return true;
 
+            if(!user.password) return await Promise.reject(new Error('No password set for this user, please login via biometrics'));
+
             const valid = await compare(value, user.password);
             if (!valid) return await Promise.reject(new Error('Invalid E-mail password combination'));
             return await Promise.resolve();

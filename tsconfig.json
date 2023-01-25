@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+        "downlevelIteration": true,
 		"sourceMap": true,
 		"outDir": "dist",
 		"strict": true,

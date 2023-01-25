@@ -16,6 +16,8 @@ import { createCharacterSchema, deleteCharacterSchema, getCharacterSchema, updat
 import { createCharacter, deleteCharacter, getCharacter, getCharacters, updateCharacter } from './controllers/CharacterController';
 import { getGenres } from './controllers/GenreController';
 import { getCountries } from './controllers/CountyController';
+import { webauthnLoginFinalize, webauthnLoginInitialize, webauthnRegisterFinalize, webauthnRegisterInitialize } from './controllers/WebAuthNController';
+import { loginFinalizeSchema, loginInitializeSchema, registerFinalizeSchema, registerInitializeSchema } from './middlewares/WebauthnValidation';
 
 const app = express();
 app.use(helmet());
@@ -24,6 +26,12 @@ app.use(cookieParser());
 app.use(cors({origin: true, credentials: true}));
 
 // disable cors when live && remove withcredentials true from angular
+
+// WebauthN
+app.post('/webauthn/register_initialize', validate(registerInitializeSchema), webauthnRegisterInitialize);
+app.post('/webauthn/register_finalize', validate(registerFinalizeSchema), webauthnRegisterFinalize);
+app.post('/webauthn/login_initialize', validate(loginInitializeSchema), webauthnLoginInitialize);
+app.post('/webauthn/login_finalize', validate(loginFinalizeSchema), webauthnLoginFinalize);
 
 // Genres & Countries
 app.get('/genres', validate(isAuth), getGenres);
@@ -82,4 +90,4 @@ app.patch('/character/:id', updateCharacterSchema, validate(), updateCharacter);
 // // delete
 app.delete('/character/:id', validate(deleteCharacterSchema), deleteCharacter);
 
-app.listen(process.env.PORT, () => console.log(`🚀 Server ready` + process.env.PRODUCTION ? `.` : `at: http://localhost:${process.env.PORT}`));
+app.listen(process.env.PORT, () => console.log(`🚀 Server ready` + !process.env.PRODUCTION ? `.` : `at: http://localhost:${process.env.PORT}`));

@@ -7,6 +7,7 @@
 		"start": "node ./dist/index.js",
 		"start:prod": "node ./dist/src/index.js",
 		"start:migrate:prod": "prisma migrate deploy && prisma db seed && npm run start:prod",
+        "start:reset:prod": "prisma migrate reset -f && npm run start:prod",
 		"dev": "nodemon src/index.ts",
 		"build": "tsc --project ./"
 	},
@@ -30,6 +31,8 @@
 	},
 	"dependencies": {
 		"@prisma/client": "^3.10.0",
+		"@simplewebauthn/server": "^7.0.0",
+		"@simplewebauthn/typescript-types": "^7.0.0",
 		"@types/bcryptjs": "^2.4.2",
 		"@types/body-parser": "^1.19.2",
 		"@types/cookie-parser": "^1.4.2",
@@ -42,7 +45,9 @@
 		"express": "4.17.2",
 		"express-validator": "^6.14.0",
 		"helmet": "^5.0.1",
-		"jsonwebtoken": "^8.5.1"
+		"jsonwebtoken": "^8.5.1",
+		"uuid-parse": "^1.1.0",
+		"webauthn": "^0.2.0"
 	},
 	"engines": {
 		"node": ">=10.0.0"

@@ -22,4 +22,4 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 80
-CMD [  "npm", "run", "start:migrate:prod" ]
+CMD [ "npm", "run", "start:reset:prod" ]

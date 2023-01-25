@@ -17,9 +17,10 @@ enum Role {
 model User {
   id			Int			@id @default(autoincrement())
   email			String		@unique
-  password		String
+  password		String?
   role			Role		@default(USER)
   profile		Profile?
+  credentials   Authenticator[]
   tokenVersion	Int			@default(0)
   createdAt		DateTime	@default(now())
   updatedAt		DateTime	@updatedAt
@@ -30,13 +31,13 @@ model Profile {
   bio			String?
   avatarUrl		String?
   user			User		@relation(fields: [userId], references: [id])
-  userId		Int
+  userId		Int         @unique
   createdAt		DateTime	@default(now())
   updatedAt		DateTime	@updatedAt
 }
 model Genre {
   id			Int			@id @default(autoincrement())
-  name			String
+  name			String      @unique
   movies		GenresOnMovies[]
   createdAt		DateTime	@default(now())
   updatedAt		DateTime	@updatedAt
@@ -56,6 +57,7 @@ model Movie {
   genres		GenresOnMovies[]
   createdAt		DateTime	@default(now())
   updatedAt		DateTime	@updatedAt
+  @@unique([name, year, length])
 }
 model Person {
   id			Int			@id @default(autoincrement())
@@ -72,6 +74,7 @@ model Person {
   cast			CastOnMovies[]
   createdAt		DateTime	@default(now())
   updatedAt		DateTime	@updatedAt
+  @@unique([firstName, lastName, birthday])
 }
 model Character {
   id			Int			@id @default(autoincrement())
@@ -83,10 +86,11 @@ model Character {
 //   persons		CharactersOnPersons[]
   createdAt		DateTime	@default(now())
   updatedAt		DateTime	@updatedAt
+    @@unique([firstName, lastName, birthday, bio])
 }
 model Country {
   id			Int			@id @default(autoincrement())
-  name			String
+  name			String      @unique
   persons		Person[]
   createdAt		DateTime	@default(now())
   updatedAt		DateTime	@updatedAt
@@ -144,4 +148,17 @@ model CastOnMovies {
   updatedAt		DateTime	@updatedAt
 
   @@id([movieId, personId])
+}
+
+model Authenticator {
+    credentialID            String		@id @unique
+    credentialPublicKey     Bytes
+    counter                 BigInt
+    credentialDeviceType    String
+    credentialBackedUp      Boolean
+    transports              String[]
+    user                    User		@relation(fields: [userId], references: [id])
+    userId                  Int
+    createdAt               DateTime	@default(now())
+    updatedAt               DateTime	@updatedAt
 }

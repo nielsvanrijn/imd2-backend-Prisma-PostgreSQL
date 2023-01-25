@@ -11,41 +11,16 @@ const prisma = new PrismaClient();
 
 async function main() {
     // Countries
-
-    const firstCountry = await prisma.country.findFirst({
-        where: {
-            name: countries.shift()
-        }
+    await prisma.country.createMany({
+        skipDuplicates: true,
+        data: countries.map((country) => ({name: country}))
     });
-    const lastCountry = await prisma.country.findFirst({
-        where: {
-            name: countries.pop()
-        }
-    });
-    if (!firstCountry && !lastCountry) {
-        await prisma.country.createMany({
-            skipDuplicates: true,
-            data: countries.map((country) => ({name: country}))
-        });
-    }
 
     // Genres
-    const firstGenre = await prisma.genre.findFirst({
-        where: {
-            name: genres.shift()
-        }
+    await prisma.genre.createMany({
+        skipDuplicates: true,
+        data: genres.map((genre) => ({name: genre}))
     });
-    const lastGenre = await prisma.genre.findFirst({
-        where: {
-            name: genres.pop()
-        }
-    });
-    if (!firstGenre && !lastGenre) {
-        await prisma.genre.createMany({
-            skipDuplicates: true,
-            data: genres.map((genre) => ({name: genre}))
-        });
-    }
 	
     // Users
     (await users()).forEach(async (user) => {
@@ -53,78 +28,78 @@ async function main() {
             where: {
                 email: user.email
             },
-            update: {},
+            update: user,
             create: user
         });
     });
 
     // Persons
-    const firstPerson = await prisma.person.findFirst({
-        where: {
-            firstName: persons.shift()?.firstName,
-            lastName: persons.shift()?.lastName
-        }
-    });
-    const lastPerson = await prisma.person.findFirst({
-        where: {
-            firstName: persons.pop()?.firstName,
-            lastName: persons.pop()?.lastName
-        }
-    });
-    if (!firstPerson && !lastPerson) {
-        for (const person of persons) {
-            await prisma.person.create({
-                data: person
-            });
-        }
-    }
-    // persons.forEach(async (person) => {
+    // const firstPerson = await prisma.person.findFirst({
+    //     where: {
+    //         firstName: persons.shift()?.firstName,
+    //         lastName: persons.shift()?.lastName
+    //     }
+    // });
+    // const lastPerson = await prisma.person.findFirst({
+    //     where: {
+    //         firstName: persons.pop()?.firstName,
+    //         lastName: persons.pop()?.lastName
+    //     }
+    // });
+    // if (!firstPerson && !lastPerson) {
+    // for (const person of persons) {
     //     await prisma.person.create({
     //         data: person
     //     });
-    // });
+    // }
+    await prisma.person.createMany({
+        skipDuplicates: true,
+        data: persons.map((person) => ({
+            firstName: person.firstName,
+            lastName: person.lastName,
+            birthday: person.birthday,
+            countryId: person.country.connect.id,
+            bio: person.bio,
+            avatarUrl: person.avatarUrl
+        }))
+    });
+    // }
 
     // Characters
-    const firstCharacter = await prisma.character.findFirst({
-        where: {
-            firstName: characters.shift()?.firstName,
-            lastName: characters.shift()?.lastName
-        }
+    await prisma.character.createMany({
+        skipDuplicates: true,
+        data: characters.map((character) => ({
+            firstName: character.firstName,
+            lastName: character.lastName,
+            birthday: character.birthday,
+            bio: character.bio,
+        }))
     });
-    const lastCharacter = await prisma.character.findFirst({
-        where: {
-            firstName: characters.pop()?.firstName,
-            lastName: characters.pop()?.lastName
-        }
-    });
-    if (!firstCharacter && !lastCharacter) {
-        characters.forEach(async (character) => {
-            await prisma.character.create({
-                data: character
-            });
-        });
-    }
 
     // Movies
-    const firstMovie = await prisma.movie.findFirst({
-        where: {
-            name: movies.shift()?.name,
-            year: movies.shift()?.year
-        }
-    });
-    const lastMovie = await prisma.movie.findFirst({
-        where: {
-            name: movies.pop()?.name,
-            year: movies.pop()?.year
-        }
-    });
-    if (!firstMovie && !lastMovie) {
-        movies.forEach(async (movie) => {
-            await prisma.movie.create({
-                data: movie
-            });
+    for (const movie of movies) {
+        await prisma.movie.upsert({
+            where: {
+                name_year_length: {
+                    name: movie.name,
+                    year: movie.year,
+                    length: movie.length
+                }
+            },
+            update: movie,
+            create: movie
         });
     }
+    // await prisma.movie.createMany({
+    //     skipDuplicates: true,
+    //     data: movies.map((movie) => ({
+    //         name: movie.name,
+    //         year: movie.year,
+    //         length: movie.length,
+    //         description: movie.description,
+    //         posterUrls: movie.posterUrls,
+    //     }))
+    // });
 }
 
 main()
