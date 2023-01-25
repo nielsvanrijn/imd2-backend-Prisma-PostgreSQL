@@ -196,7 +196,6 @@ export const webauthnLoginInitialize = async (req: Request, res: Response) => {
         console.log(e);
         return res.status(500).send({ ok: false });
     }
-
 };
 
 // WebauthN login finalize

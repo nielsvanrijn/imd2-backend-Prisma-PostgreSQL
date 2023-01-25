@@ -16,7 +16,7 @@ import { createCharacterSchema, deleteCharacterSchema, getCharacterSchema, updat
 import { createCharacter, deleteCharacter, getCharacter, getCharacters, updateCharacter } from './controllers/CharacterController';
 import { getGenres } from './controllers/GenreController';
 import { getCountries } from './controllers/CountyController';
-import { webauthnLoginFinalize, webauthnLoginInitialize, webauthnRegisterFinalize, webauthnRegisterInitialize } from './controllers/WebAuthNController';
+import { webauthnLoginFinalize, webauthnLoginInitialize, webauthnRegisterFinalize, webauthnRegisterInitialize } from './controllers/WebauthnController';
 import { loginFinalizeSchema, loginInitializeSchema, registerFinalizeSchema, registerInitializeSchema } from './middlewares/WebauthnValidation';
 
 const app = express();
